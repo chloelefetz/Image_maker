@@ -34,16 +34,6 @@ def luminosite_image(canvas, chiffre_entry):
     canvas.config(width=largeur_image, height=hauteur_image)
     canvas.create_image(0, 0, anchor=tk.NW, image=photo)
 
-# def entree_valide(valeur) -> bool:
-#     """
-#     Verifie si la valeur est composée de chiffres
-#     Elle renvoie True si elle est composée que de chiffres, autrement elle renvoie False 
-#     """
-#     if valeur.isdigit():
-#         return True
-#     else :
-#         return False 
-
 def boite_luminosite(canvas):
     """
     Création une nouvelle page tkinter
@@ -54,14 +44,37 @@ def boite_luminosite(canvas):
     fenetre_luminosité = tk.Tk()
     fenetre_luminosité.title("Modifier la luminosité")
     # Créé une zone pour ecrire un nombre
-    cmd = fenetre_luminosité.register(lambda s: not s or s.isdigit())
-    chiffre_entry = tk.Entry(fenetre_luminosité, validatecommand=(cmd, "%P"))
+    chiffre = tk.StringVar()
+    chiffre_entry = tk.Entry(fenetre_luminosité, textvariable=chiffre)
     chiffre_entry.pack()
+    chiffre_entry.insert(0, str(0))
+    slider = tk.Scale(fenetre_luminosité, from_=-255, to=255, orient="horizontal")
+    slider.pack(padx=50, pady=50)
+    initial_value = 0
+    slider.set(initial_value)
     ajouter_bouton = tk.Button(fenetre_luminosité, text="Valider", command=lambda:luminosite_image(canvas, chiffre_entry))
     ajouter_bouton.pack()
+    slider.bind("<B1-Motion>", lambda event: on_slider_change(event, chiffre_entry)) # <B1-Motion> = Mouvement souris avec bouton 1/gauche enfoncé
+    slider.bind("<ButtonRelease-1>", lambda event: on_slider_change(event, chiffre_entry)) # <ButtonRelease-1> = l'utilisateur relache le bouton 1
+    chiffre_entry.bind("<Return>", lambda event: on_entry_change(event, slider)) # <Return> = L'utilisateur appuie sur entrer
     fenetre_luminosité.mainloop()
 
+def on_entry_change(event, slider):
+    """
+    La fonction prend en paramètre "event" qui est un evenement de tkinter
+    et met à jour la valeur du slider quand on appuie sur entrer
+    """
+    value = event.widget.get()
+    slider.set(value)
 
 
+def on_slider_change(event, chiffre_entry):
+    """
+    La fonction prend en paramètre "event" qui est un evenement de tkinter
+    et met à jour chiffre entry (valeur du tk.entry)
+    """
+    value = event.widget.get()
+    chiffre_entry.delete(0, tk.END)  # Supprime le texte actuel dans l'Entry
+    chiffre_entry.insert(0, str(value))  # Ajoute la nouvelle valeur dans l'Entry
 
-
+    

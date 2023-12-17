@@ -11,6 +11,7 @@ from pixeliser import boite_pixeliser
 from Pipette import pipette
 # from collage import boite_image2
 from Retour import *
+from tkinter import *
 # from Rotation import rotation
 # from Theme_image import theme_image
 
@@ -67,7 +68,7 @@ window.config(background="black")
 
 #Création frame barre d'outils
 frame_outil = tk.Frame(window, bg="gray", bd=1)
-frame_outil.pack()
+frame_outil.pack(side="left", fill="y")
 
 #Ajouter du texte
 text_outil = tk.Label(frame_outil, text = "Barre d'outils", font=("Arial", 10), fg="black")
@@ -88,21 +89,16 @@ canvas.bind("<Button-3>", click_droit_canvas)
 # création de l'indice pour la sauvegarde
 # indice_temp = 0
 
-
-# coding: utf-8 
-from tkinter import *
- 
-# Création de la barre des menu
+# Création de la barre de menu
 menuBar = Menu(window) 
- 
-# Création du menu
+
+# Création des menus dans le menu
 menuFichier  = Menu(menuBar, tearoff = 0) 
 menuBar.add_cascade(label="Fichier",menu=menuFichier) 
-
 menuCouleur  = Menu(menuBar, tearoff = 0) 
 menuBar.add_cascade(label="Couleur",menu=menuCouleur)
-# menuLuminosite  = Menu(menuBar, tearoff = 0) 
-# menuLuminosite.add_command(label="Luminosité",menu=menuLuminosite, command=lambda:boite_luminosite(canvas))
+menuLuminosité  = Menu(menuBar, tearoff = 0) 
+menuBar.add_cascade(label="Luminosité",menu=menuLuminosité)
 menuContraste  = Menu(menuBar, tearoff = 0) 
 menuBar.add_cascade(label="Contraste",menu=menuContraste)
 menuCollage  = Menu(menuBar, tearoff = 0) 
@@ -112,7 +108,7 @@ menuBar.add_cascade(label="Pixeliser",menu=menuPixeliser)
 menuPosition  = Menu(menuBar, tearoff = 0) 
 menuBar.add_cascade(label="Position",menu=menuPosition)
 
-# Création des sous menus
+# Création des sous menus du menu
 menuFichier.add_command(label="Ouvrir image", command=lambda:ouvrir_image(canvas)) 
 menuFichier.add_command(label="Sauvegarder", command=sauvegarder_image) 
 menuFichier.add_command(label="Quitter", command=quit) 
@@ -120,49 +116,34 @@ menuCouleur.add_command(label="Rouge")
 menuCouleur.add_command(label="Bleu") 
 menuCouleur.add_command(label="Vert") 
 menuCouleur.add_command(label="Inverser Couleurs", command=lambda:inverser_couleur_image(canvas)) 
-menuPosition.add_command(label="Rotation") 
-menuPosition.add_command(label="Miroir")
+menuLuminosité.add_command(label="Luminosité", command=lambda:boite_luminosite(canvas))
+menuPixeliser.add_command(label="Pixeliser", command=lambda:boite_pixeliser(canvas))
+# menuPosition.add_command(label="Rotation",  command=lambda:rotation(canvas)) 
+menuPosition.add_command(label="Miroir", command=lambda:miroir(canvas))
 menuPosition.add_command(label="Mirroir central", command=lambda:miroir_central(canvas)) 
 menuPosition.add_command(label="Miroir vertical", command=lambda:miroir_vertical(canvas))
 menuPosition.add_command(label="Miroir horizontal", command=lambda:miroir_horizontal(canvas))
  
 # Configuration de la barre des menus
 window.config(menu=menuBar)
-window.mainloop()
 
 #Créations boutons 
-button_import = tk.Button(frame_outil, text="Importer image", command=lambda:ouvrir_image(canvas))
-button_import.pack()
-button_eclaircir = tk.Button(frame_outil, text="Luminosité", command=lambda:boite_luminosite(canvas))
-button_eclaircir.pack()
 button_filtre = tk.Button(frame_outil, text="Inverser les couleurs", command=lambda:inverser_couleur_image(canvas))
 button_filtre.pack()
 # button_filtre = tk.Button(frame_outil, text="filtre rouge", command=lambda:rouge_image(canvas))
 # button_filtre.pack()
 button_rogner = tk.Button(frame_outil, text="Rogner", command=lambda:rogner_image(canvas))
 button_rogner.pack()
-button_sauvegarder = tk.Button(frame_outil, text="Sauvegarder", command=sauvegarder_image)
-button_sauvegarder.pack()
 button_redimentionner = tk.Button(frame_outil, text="Redimensionner", command=lambda:boite_redimentionner(canvas))
 button_redimentionner.pack()
-button_pixeliser = tk.Button(frame_outil, text="Pixeliser", command=lambda:boite_pixeliser(canvas))
-button_pixeliser.pack()
 button_pipette = tk.Button(frame_outil, text="Pipette", command=lambda:pipette(x1, y1))
 button_pipette.pack()
 # button_collage = tk.Button(frame_outil, text="Collage", command=lambda:boite_image2(canvas))
 # button_collage.pack()
-button_collage = tk.Button(frame_outil, text="Miroir Central", command=lambda:miroir_central(canvas))
-button_collage.pack()
-button_collage = tk.Button(frame_outil, text="Miroir Vertical", command=lambda:miroir_vertical(canvas))
-button_collage.pack()
-button_collage = tk.Button(frame_outil, text="Miroir Horizontal", command=lambda:miroir_horizontal(canvas))
-button_collage.pack()
 button_collage = tk.Button(frame_outil, text="<-", command=lambda:retour_arriere(canvas))
 button_collage.pack()
 button_collage = tk.Button(frame_outil, text="->", command=lambda:retour_avant(canvas))
 button_collage.pack()
-# button_rotation = tk.Button(frame_outil, text="Rotation", command=lambda:rotation(canvas))
-# button_rotation.pack()
 
 button_test = tk.Button(frame_outil, text="TEST", command=test_image)
 button_test.pack()
