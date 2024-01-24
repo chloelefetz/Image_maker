@@ -7,7 +7,6 @@ def rogner_image(canvas):
     Permet de rogner une image 
     Ouvre image_temporaire.png
     Transforme l'image en tableau a trois dimention
-    #// à compléter 
     Sauvegarde le resultat dans image_temporaire.png
     """
     global photo
@@ -15,7 +14,7 @@ def rogner_image(canvas):
     image_entrée = Image.open("image_temporaire.png")
     image_np = np.asarray(image_entrée)
     # Créé l'image de sortie (éclaircie) sous forme de tableau numpy
-    image_sortie = image_np[160:218,120:185]
+    image_sortie = image_np[c.x1:c.y2, c.y1:c.x2]
 
     # Sauvegarde les images pour pouvoir les afficher
     Image.fromarray(image_sortie).save("image_temporaire.png")
