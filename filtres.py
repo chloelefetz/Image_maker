@@ -2,7 +2,7 @@ from PIL import Image, ImageTk, ImageDraw
 import numpy as np
 import tkinter as tk
 
-def inverser_couleur_image(canvas):
+def inverser_couleur_image(canvas, d):
     """
     Permet d'inverser les couleurs d'une image\n
     Ouvre image_temporaire.png\n
@@ -12,7 +12,7 @@ def inverser_couleur_image(canvas):
     """
     global photo
     # Charge l'image ouverte par la fonction ouvrir_image et la transforme en tableau couleurs
-    image_entrée = Image.open(f"image_temporaire_{d - 1}.png")
+    image_entrée = Image.open(f"image_temporaire_{d.indice_temp - 1}.png")
     image_np = np.asarray(image_entrée)
     nb_lignes, nb_colonnes, _ = image_np.shape  
 
@@ -24,13 +24,14 @@ def inverser_couleur_image(canvas):
                 image_sortie[ligne,col,i] = 255 - image_sortie[ligne,col,i]
 
     # Sauvegarde les images pour pouvoir les afficher
-    Image.fromarray(image_sortie).save(f"image_temporaire_{d}.png")
+    Image.fromarray(image_sortie).save(f"image_temporaire_{d.indice_temp}.png")
     canvas.delete("all")
-    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d}.png")
+    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d.indice_temp}.png")
     largeur_image = photo.width()
     hauteur_image = photo.height()
     canvas.config(width=largeur_image, height=hauteur_image)
     canvas.create_image(0, 0, anchor=tk.NW, image=photo)
+    d.indice_temp += 1
     
 def rouge_image(canvas, d):
     """
@@ -43,7 +44,7 @@ def rouge_image(canvas, d):
     
     # Charge l'image ouverte par la fonction ouvrir_image et la transforme en tableau couleurs
     global photo
-    image_entrée = Image.open(f"image_temporaire_{d - 1}.png")
+    image_entrée = Image.open(f"image_temporaire_{d.indice_temp - 1}.png")
     image = np.asarray(image_entrée)
     image_sortie = np.copy(image)
 
@@ -52,13 +53,14 @@ def rouge_image(canvas, d):
     image_sortie[:, :, 2] = 0  # Mettre à zéro le canal bleu
 
 
-    Image.fromarray(image_sortie).save(f"image_temporaire_{d}.png")
+    Image.fromarray(image_sortie).save(f"image_temporaire_{d.indice_temp}.png")
     canvas.delete("all")
-    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d}.png")
+    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d.indice_temp}.png")
     largeur_image = photo.width()
     hauteur_image = photo.height()
     canvas.config(width=largeur_image, height=hauteur_image)
     canvas.create_image(0, 0, anchor=tk.NW, image=photo)
+    d.indice_temp += 1
 
 def vert_image(canvas, d):
     """
@@ -71,7 +73,7 @@ def vert_image(canvas, d):
     
     # Charge l'image ouverte par la fonction ouvrir_image et la transforme en tableau couleurs
     global photo
-    image_entrée = Image.open(f"image_temporaire_{d - 1}.png")
+    image_entrée = Image.open(f"image_temporaire_{d.indice_temp - 1}.png")
     image = np.asarray(image_entrée)
     image_sortie = np.copy(image)
     
@@ -80,13 +82,14 @@ def vert_image(canvas, d):
     image_sortie[:, :, 2] = 0  # Mettre à zéro le canal bleu
 
 
-    Image.fromarray(image_sortie).save(f"image_temporaire_{d}.png")
+    Image.fromarray(image_sortie).save(f"image_temporaire_{d.indice_temp}.png")
     canvas.delete("all")
-    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d}.png")
+    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d.indice_temp}.png")
     largeur_image = photo.width()
     hauteur_image = photo.height()
     canvas.config(width=largeur_image, height=hauteur_image)
     canvas.create_image(0, 0, anchor=tk.NW, image=photo)
+    d.indice_temp += 1
 
 def bleu_image(canvas, d):
     """
@@ -99,7 +102,7 @@ def bleu_image(canvas, d):
     
     # Charge l'image ouverte par la fonction ouvrir_image et la transforme en tableau couleurs
     global photo
-    image_entrée = Image.open(f"image_temporaire_{d - 1}.png")
+    image_entrée = Image.open(f"image_temporaire_{d.indice_temp - 1}.png")
     image = np.asarray(image_entrée)
     image_sortie = np.copy(image)
     
@@ -108,13 +111,14 @@ def bleu_image(canvas, d):
     image_sortie[:, :, 1] = 0  # Mettre à zéro le canal vert
 
 
-    Image.fromarray(image_sortie).save(f"image_temporaire_{d}.png")
+    Image.fromarray(image_sortie).save(f"image_temporaire_{d.indice_temp}.png")
     canvas.delete("all")
-    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d}.png")
+    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d.indice_temp}.png")
     largeur_image = photo.width()
     hauteur_image = photo.height()
     canvas.config(width=largeur_image, height=hauteur_image)
     canvas.create_image(0, 0, anchor=tk.NW, image=photo)
+    d.indice_temp += 1
 
 def cyan_image(canvas, d):
     """
@@ -127,20 +131,21 @@ def cyan_image(canvas, d):
     
     # Charge l'image ouverte par la fonction ouvrir_image et la transforme en tableau couleurs
     global photo
-    image_entrée = Image.open(f"image_temporaire_{d - 1}.png")
+    image_entrée = Image.open(f"image_temporaire_{d.indice_temp - 1}.png")
     image = np.asarray(image_entrée)
     image_sortie = np.copy(image)
     
     # Appliquer le filtre cyan
     image_sortie[:, :, 0] = 0  # Mettre à zéro le canal rouge
 
-    Image.fromarray(image_sortie).save(f"image_temporaire_{d}.png")
+    Image.fromarray(image_sortie).save(f"image_temporaire_{d.indice_temp}.png")
     canvas.delete("all")
-    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d}.png")
+    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d.indice_temp}.png")
     largeur_image = photo.width()
     hauteur_image = photo.height()
     canvas.config(width=largeur_image, height=hauteur_image)
-    canvas.create_image(0, 0, anchor=tk.NW, image=photo)    
+    canvas.create_image(0, 0, anchor=tk.NW, image=photo)
+    d.indice_temp += 1
 
 def jaune_image(canvas, d):
     """
@@ -153,20 +158,21 @@ def jaune_image(canvas, d):
     
     # Charge l'image ouverte par la fonction ouvrir_image et la transforme en tableau couleurs
     global photo
-    image_entrée = Image.open(f"image_temporaire_{d - 1}.png")
+    image_entrée = Image.open(f"image_temporaire_{d.indice_temp - 1}.png")
     image = np.asarray(image_entrée)
     image_sortie = np.copy(image)
     
     # Appliquer le filtre jaune
     image_sortie[:, :, 2] = 0  # Mettre à zéro le canal bleu
 
-    Image.fromarray(image_sortie).save(f"image_temporaire_{d}.png")
+    Image.fromarray(image_sortie).save(f"image_temporaire_{d.indice_temp}.png")
     canvas.delete("all")
-    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d}.png")
+    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d.indice_temp}.png")
     largeur_image = photo.width()
     hauteur_image = photo.height()
     canvas.config(width=largeur_image, height=hauteur_image)
-    canvas.create_image(0, 0, anchor=tk.NW, image=photo)    
+    canvas.create_image(0, 0, anchor=tk.NW, image=photo)
+    d.indice_temp += 1
 
 def magenta_image(canvas, d):
     """
@@ -179,20 +185,21 @@ def magenta_image(canvas, d):
     
     # Charge l'image ouverte par la fonction ouvrir_image et la transforme en tableau couleurs
     global photo
-    image_entrée = Image.open(f"image_temporaire_{d - 1}.png")
+    image_entrée = Image.open(f"image_temporaire_{d.indice_temp - 1}.png")
     image = np.asarray(image_entrée)
     image_sortie = np.copy(image)
     
     # Appliquer le filtre magenta
     image_sortie[:, :, 1] = 0  # Mettre à zéro le canal vert
 
-    Image.fromarray(image_sortie).save(f"image_temporaire_{d}.png")
+    Image.fromarray(image_sortie).save(f"image_temporaire_{d.indice_temp}.png")
     canvas.delete("all")
-    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d}.png")
+    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d.indice_temp}.png")
     largeur_image = photo.width()
     hauteur_image = photo.height()
     canvas.config(width=largeur_image, height=hauteur_image)
-    canvas.create_image(0, 0, anchor=tk.NW, image=photo)    
+    canvas.create_image(0, 0, anchor=tk.NW, image=photo)
+    d.indice_temp += 1
 
 def nuance_de_gris(canvas, d):
     """
@@ -204,16 +211,17 @@ def nuance_de_gris(canvas, d):
     
     # Charge l'image ouverte par la fonction ouvrir_image et la transforme en tableau couleurs
     global photo
-    image_entrée = Image.open(f"image_temporaire_{d - 1}.png")
+    image_entrée = Image.open(f"image_temporaire_{d.indice_temp - 1}.png")
     image_sortie = image_entrée.convert("L")
 
-    image_sortie.save(f"image_temporaire_{d}.png")
+    image_sortie.save(f"image_temporaire_{d.indice_temp}.png")
     canvas.delete("all")
-    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d}.png")
+    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d.indice_temp}.png")
     largeur_image = photo.width()
     hauteur_image = photo.height()
     canvas.config(width=largeur_image, height=hauteur_image)
     canvas.create_image(0, 0, anchor=tk.NW, image=photo)
+    d.indice_temp += 1
 
 def sepia(canvas, d):
     """
@@ -223,7 +231,7 @@ def sepia(canvas, d):
     Sauvegarde le resultat dans image_temporaire.png
     """
     global photo
-    image_entrée = Image.open(f"image_temporaire_{d - 1}.png")
+    image_entrée = Image.open(f"image_temporaire_{d.indice_temp - 1}.png")
     Taille = image_entrée.size
     image_sortie_Sepia = Image.new("RGB", Taille)
 
@@ -244,10 +252,11 @@ def sepia(canvas, d):
             
             image_sortie_Sepia.putpixel((x, y), (taux_rouge, taux_vert, taux_bleu))
 
-    image_sortie_Sepia.save(f"image_temporaire_{d}.png")
+    image_sortie_Sepia.save(f"image_temporaire_{d.indice_temp}.png")
     canvas.delete("all")
-    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d}.png")
+    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d.indice_temp}.png")
     largeur_image = photo.width()
     hauteur_image = photo.height()
     canvas.config(width=largeur_image, height=hauteur_image)
     canvas.create_image(0, 0, anchor=tk.NW, image=photo)
+    d.indice_temp += 1
