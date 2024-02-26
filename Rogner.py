@@ -2,7 +2,7 @@ from PIL import Image, ImageTk
 import numpy as np
 import tkinter as tk
 
-def rogner_image(canvas):
+def rogner_image(canvas, c, d):
     """
     Permet de rogner une image 
     Ouvre image_temporaire.png
@@ -11,15 +11,15 @@ def rogner_image(canvas):
     """
     global photo
     # Charge l'image ouverte par la fonction ouvrir_image et la transforme en tableau couleurs
-    image_entrée = Image.open("image_temporaire.png")
+    image_entrée = Image.open("image_temporaire_{d - 1}.png")
     image_np = np.asarray(image_entrée)
     # Créé l'image de sortie (éclaircie) sous forme de tableau numpy
     image_sortie = image_np[c.x1:c.y2, c.y1:c.x2]
 
     # Sauvegarde les images pour pouvoir les afficher
-    Image.fromarray(image_sortie).save("image_temporaire.png")
+    Image.fromarray(image_sortie).save("image_temporaire_{d}.png")
     canvas.delete("all")
-    photo = ImageTk.PhotoImage(file="image_temporaire.png")
+    photo = ImageTk.PhotoImage(file="image_temporaire_{d}.png")
     largeur_image = photo.width()
     hauteur_image = photo.height()
     canvas.config(width=largeur_image, height=hauteur_image)
