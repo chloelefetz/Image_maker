@@ -12,20 +12,20 @@ def ouvrir_image(canvas):
     global photo
     file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.png *.jpg *.jpeg *.gif *.bmp *.ppm *.pgm")])
     if file_path:
+        for i in range(10000):
+            if path.isfile(f"image_temporaire_{i}.png"):
+                remove(f"image_temporaire_{i}.png")
+                
         canvas.delete("all")
         image = Image.open(file_path).convert("RGBA")
         photo = ImageTk.PhotoImage(image)
-        print("1")
         # photo = tk.PhotoImage(file=file_path)
-        print("2")
         largeur_image = photo.width()
         hauteur_image = photo.height()
-        print("3")
         canvas.config(width=largeur_image, height=hauteur_image)
-        print("4")
         canvas.create_image(0, 0, anchor=tk.NW, image=photo)
-        print("5")
-        
-        print("6")
-        image.save(f"image_temporaire.png")
-        image.save(f"image_temporaire_1.png")
+        nouveau_texte = "\nRésolution\nLargeur : " + str(largeur_image) + "px\nHauteur : " + str(hauteur_image) + "px"
+        text_resolution.config(text=nouveau_texte)
+        d.indice_temp = 0
+        image.save(f"image_temporaire_{d.indice_temp}.png")
+        d.indice_temp += 1
