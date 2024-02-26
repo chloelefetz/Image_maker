@@ -3,7 +3,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import numpy as np
 
-def contraste_image(canvas, chiffre_entry):
+def contraste_image(canvas, chiffre_entry, d):
     """
     Permet d'accentuer le contraste d' une image 
     Ouvre image_temporaire.png
@@ -16,7 +16,7 @@ def contraste_image(canvas, chiffre_entry):
     valeur = chiffre_entry.get()
     valeur = int(valeur)
     # Charge l'image ouverte par la fonction ouvrir_image et la transforme en tableau couleurs
-    image_entrée = Image.open("image_temporaire.png")
+    image_entrée = Image.open(f"image_temporaire_{d - 1}.png")
     image_np = np.asarray(image_entrée)
     nb_lignes, nb_colonnes, _ = image_np.shape 
     # Créé l'image de sortie sous forme de tableau numpy 
@@ -27,15 +27,15 @@ def contraste_image(canvas, chiffre_entry):
                 new_color = (image_sortie[ligne,col,i]-127)*(valeur/100)+127
                 image_sortie[ligne,col,i] = max(0, min(new_color,255))
     # Sauvegarde les images pour pouvoir les afficher
-    Image.fromarray(image_sortie).save("image_temporaire.png")
+    Image.fromarray(image_sortie).save(f"image_temporaire_{d}.png")
     canvas.delete("all")
-    photo = ImageTk.PhotoImage(file="image_temporaire.png")
+    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d}.png")
     largeur_image = photo.width()
     hauteur_image = photo.height()
     canvas.config(width=largeur_image, height=hauteur_image)
     canvas.create_image(0, 0, anchor=tk.NW, image=photo)
 
-def boite_contraste(canvas):
+def boite_contraste(canvas, d):
     """
     Création une nouvelle page tkinter
     Champ créé pour ecrire un nombre 
