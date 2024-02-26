@@ -26,9 +26,9 @@ def luminosite_image(canvas, chiffre_entry, d):
             for i in range(3):
                 image_sortie[ligne,col,i] = max(0, min(image_sortie[ligne,col,i]+valeur,255))
     # Sauvegarde les images pour pouvoir les afficher
-    Image.fromarray(image_sortie).save(f"image_temporaire{d.indice_temp}.png")
+    Image.fromarray(image_sortie).save(f"image_temporaire_{d.indice_temp}.png")
     canvas.delete("all")
-    photo = ImageTk.PhotoImage(file=f"image_temporaire{d.indice_temp}.png")
+    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d.indice_temp}.png")
     largeur_image = photo.width()
     hauteur_image = photo.height()
     canvas.config(width=largeur_image, height=hauteur_image)
