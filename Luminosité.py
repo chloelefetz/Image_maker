@@ -3,7 +3,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import numpy as np
 
-def luminosite_image(canvas, chiffre_entry):
+def luminosite_image(canvas, chiffre_entry, d):
     """
     Permet d'eclaircir une image 
     Ouvre image_temporaire.png
@@ -16,7 +16,7 @@ def luminosite_image(canvas, chiffre_entry):
     valeur = chiffre_entry.get()
     valeur = int(valeur)
     # Charge l'image ouverte par la fonction ouvrir_image et la transforme en tableau couleurs
-    image_entrée = Image.open("image_temporaire.png")
+    image_entrée = Image.open("image_temporaire_{d - 1}.png")
     image_np = np.asarray(image_entrée)
     nb_lignes, nb_colonnes, _ = image_np.shape 
     # Créé l'image de sortie sous forme de tableau numpy 
@@ -26,15 +26,15 @@ def luminosite_image(canvas, chiffre_entry):
             for i in range(3):
                 image_sortie[ligne,col,i] = max(0, min(image_sortie[ligne,col,i]+valeur,255))
     # Sauvegarde les images pour pouvoir les afficher
-    Image.fromarray(image_sortie).save("image_temporaire.png")
+    Image.fromarray(image_sortie).save("image_temporaire{d}.png")
     canvas.delete("all")
-    photo = ImageTk.PhotoImage(file="image_temporaire.png")
+    photo = ImageTk.PhotoImage(file="image_temporaire{d}.png")
     largeur_image = photo.width()
     hauteur_image = photo.height()
     canvas.config(width=largeur_image, height=hauteur_image)
     canvas.create_image(0, 0, anchor=tk.NW, image=photo)
 
-def boite_luminosite(canvas):
+def boite_luminosite(canvas, d):
     """
     Création une nouvelle page tkinter
     Champ créé pour ecrire un nombre 
@@ -52,7 +52,7 @@ def boite_luminosite(canvas):
     slider.pack(padx=50, pady=50)
     initial_value = 0
     slider.set(initial_value)
-    ajouter_bouton = tk.Button(fenetre_luminosité, text="Valider", command=lambda:luminosite_image(canvas, chiffre_entry))
+    ajouter_bouton = tk.Button(fenetre_luminosité, text="Valider", command=lambda:luminosite_image(canvas, chiffre_entry, d))
     ajouter_bouton.pack()
     slider.bind("<B1-Motion>", lambda event: on_slider_change(event, chiffre_entry)) # <B1-Motion> = Mouvement souris avec bouton 1/gauche enfoncé
     slider.bind("<ButtonRelease-1>", lambda event: on_slider_change(event, chiffre_entry)) # <ButtonRelease-1> = l'utilisateur relache le bouton 1
