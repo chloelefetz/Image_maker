@@ -16,7 +16,7 @@ def luminosite_image(canvas, chiffre_entry, d):
     valeur = chiffre_entry.get()
     valeur = int(valeur)
     # Charge l'image ouverte par la fonction ouvrir_image et la transforme en tableau couleurs
-    image_entrée = Image.open("image_temporaire_{d - 1}.png")
+    image_entrée = Image.open(f"image_temporaire_{d.indice_temp - 1}.png")
     image_np = np.asarray(image_entrée)
     nb_lignes, nb_colonnes, _ = image_np.shape 
     # Créé l'image de sortie sous forme de tableau numpy 
@@ -26,13 +26,14 @@ def luminosite_image(canvas, chiffre_entry, d):
             for i in range(3):
                 image_sortie[ligne,col,i] = max(0, min(image_sortie[ligne,col,i]+valeur,255))
     # Sauvegarde les images pour pouvoir les afficher
-    Image.fromarray(image_sortie).save("image_temporaire{d}.png")
+    Image.fromarray(image_sortie).save(f"image_temporaire{d.indice_temp}.png")
     canvas.delete("all")
-    photo = ImageTk.PhotoImage(file="image_temporaire{d}.png")
+    photo = ImageTk.PhotoImage(file=f"image_temporaire{d.indice_temp}.png")
     largeur_image = photo.width()
     hauteur_image = photo.height()
     canvas.config(width=largeur_image, height=hauteur_image)
     canvas.create_image(0, 0, anchor=tk.NW, image=photo)
+    d.indice_temp += 1
 
 def boite_luminosite(canvas, d):
     """
@@ -76,5 +77,3 @@ def on_slider_change(event, chiffre_entry):
     value = event.widget.get()
     chiffre_entry.delete(0, tk.END)  # Supprime le texte actuel dans l'Entry
     chiffre_entry.insert(0, str(value))  # Ajoute la nouvelle valeur dans l'Entry
-
-    
