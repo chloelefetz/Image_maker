@@ -16,7 +16,7 @@ def contraste_image(canvas, chiffre_entry, d):
     valeur = chiffre_entry.get()
     valeur = int(valeur)
     # Charge l'image ouverte par la fonction ouvrir_image et la transforme en tableau couleurs
-    image_entrée = Image.open(f"image_temporaire_{d - 1}.png")
+    image_entrée = Image.open(f"image_temporaire_{d.indice_temp - 1}.png")
     image_np = np.asarray(image_entrée)
     nb_lignes, nb_colonnes, _ = image_np.shape 
     # Créé l'image de sortie sous forme de tableau numpy 
@@ -27,13 +27,14 @@ def contraste_image(canvas, chiffre_entry, d):
                 new_color = (image_sortie[ligne,col,i]-127)*(valeur/100)+127
                 image_sortie[ligne,col,i] = max(0, min(new_color,255))
     # Sauvegarde les images pour pouvoir les afficher
-    Image.fromarray(image_sortie).save(f"image_temporaire_{d}.png")
+    Image.fromarray(image_sortie).save(f"image_temporaire_{d.indice_temp}.png")
     canvas.delete("all")
-    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d}.png")
+    photo = ImageTk.PhotoImage(file=f"image_temporaire_{d.indice_temp}.png")
     largeur_image = photo.width()
     hauteur_image = photo.height()
     canvas.config(width=largeur_image, height=hauteur_image)
     canvas.create_image(0, 0, anchor=tk.NW, image=photo)
+    d.indice_temp += 1
 
 def boite_contraste(canvas, d):
     """
@@ -53,7 +54,7 @@ def boite_contraste(canvas, d):
     slider.pack(padx=50, pady=50)
     initial_value = 100
     slider.set(initial_value)
-    ajouter_bouton = tk.Button(fenetre_contraste, text="Valider", command=lambda:contraste_image(canvas, chiffre_entry))
+    ajouter_bouton = tk.Button(fenetre_contraste, text="Valider", command=lambda:contraste_image(canvas, chiffre_entry, d))
     ajouter_bouton.pack()
     slider.bind("<B1-Motion>", lambda event: on_slider_change(event, chiffre_entry)) # <B1-Motion> = Mouvement souris avec bouton 1/gauche enfoncé
     slider.bind("<ButtonRelease-1>", lambda event: on_slider_change(event, chiffre_entry)) # <ButtonRelease-1> = l'utilisateur relache le bouton 1
