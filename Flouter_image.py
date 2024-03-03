@@ -1,53 +1,54 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 import numpy as np
+import shutil
 from globale import zoom
 
-def boite_luminosite(canvas, d):
+def boite_flouter(canvas, d):
     """
-    Création d'une nouvelle fanêtre tkinter "Modifier la luminosité"\n
+    Crée un nouvelle fenêtre "Flouter"\n
     Elle contient : \n
-    - Un champ pour écrire un nombre ou possibilité d'utiliser un slider qui est relié au champ \n
-    - Un bouton Valider qui appel la fonction luminosite_image
-    """ 
+    - Une image d'exemple\n
+    - Un bouton qui lance la fonction flouter_image\n
+    - Une zone pour entrer un chiffre qui défini l'intensité du floutage et un slider qui est lié 
+    """
+    global photo
     # Création d'une nouvelle fenetre tkinter
-    fenetre_luminosité = tk.Toplevel()
-    fenetre_luminosité.title("Modifier la luminosité")
-    fenetre_luminosité.resizable(width=False, height=False)
-
-    # Créé une zone pour ecrire un nombre et un slider
-    chiffre = tk.StringVar()
-    chiffre_entry = tk.Entry(fenetre_luminosité, textvariable=chiffre)
-    chiffre_entry.pack()
-    chiffre_entry.insert(0, str(0))
-    slider = tk.Scale(fenetre_luminosité, from_=-255, to=255, orient="horizontal")
-    slider.pack(padx=0, pady=0)
-    slider.set(0)
-
-    # Création du bouton valider
-    ajouter_bouton = tk.Button(fenetre_luminosité, text="Valider", command=lambda:(luminosite_image(canvas, chiffre_entry, d), fenetre_luminosité.destroy()))
+    fenetre_flouter = tk.Toplevel()
+    fenetre_flouter.title("Flouter")
+    fenetre_flouter.resizable(width=False, height=False)
+    ajouter_bouton = tk.Button(fenetre_flouter, text="Valider", command=lambda:(flouter_image(canvas, chiffre_entry, d), fenetre_flouter.destroy()))
     ajouter_bouton.pack()
 
-    # Charger une image d'exemple
-    img = Image.open("image_logiciel\sportif_luminosite.png").convert("RGBA")
-    img_exemple = ImageTk.PhotoImage(img)
-    # Créer un label pour afficher l'image exemple
-    image_label = tk.Label(fenetre_luminosité, image=img_exemple)
-    image_label.pack()
+    # Création d'une zone pour entrer un chiffre et d'un slider
+    chiffre = tk.StringVar()
+    chiffre_entry = tk.Entry(fenetre_flouter, textvariable=chiffre)
+    chiffre_entry.pack()
+    chiffre_entry.insert(0, str(0))
+    slider = tk.Scale(fenetre_flouter, from_=0, to=100, orient="horizontal")
+    slider.pack(padx=0, pady=0)
+    initial_value = 0
+    slider.set(initial_value)
 
     # Mise en place d'un slider
     slider.bind("<B1-Motion>", lambda event: on_slider_change(event, chiffre_entry)) # <B1-Motion> = Mouvement souris avec bouton 1/gauche enfoncé
     slider.bind("<ButtonRelease-1>", lambda event: on_slider_change(event, chiffre_entry)) # <ButtonRelease-1> = l'utilisateur relache le bouton 1
     chiffre_entry.bind("<Return>", lambda event: on_entry_change(event, slider)) # <Return> = L'utilisateur appuie sur entrer
-    fenetre_luminosité.mainloop()
 
-def luminosite_image(canvas, chiffre_entry, d):
+    # Charger une image d'exemple
+    img = Image.open("image_logiciel\sportif_flouté.png").convert("RGBA")
+    img_exemple = ImageTk.PhotoImage(img)
+    # Créer un label pour afficher l'image exemple
+    image_label = tk.Label(fenetre_flouter, image=img_exemple)
+    image_label.pack()
+
+    fenetre_flouter.mainloop()
+
+
+def flouter_image(canvas, chiffre_entry, d):
     """
-    Permet d'eclaircir ou assombrire une image \n
-    Ouvre image_temporaire.png\n
-    Transforme l'image en tableau a trois dimention\n
-    Change la valeur des pixels de l'image -> eclaircissement ou assombrissement\n
-    Sauvegarde le resultat dans image_temporaire.png
+    Permet de flouter l'entièreté de l'image \n
+    Chaque point valant la moyenne des points à coté de lui 
     """
     global photo
     # Recupère le chiffre entré précedement
@@ -55,14 +56,21 @@ def luminosite_image(canvas, chiffre_entry, d):
     # Charge l'image ouverte par la fonction ouvrir_image et la transforme en tableau numpy
     image_entrée = Image.open(f"temporaire\image_temporaire_{d.indice_temp - 1}.png")
     image_np = np.asarray(image_entrée)
-    nb_lignes, nb_colonnes, _ = image_np.shape 
     # Créé l'image de sortie sous forme de tableau numpy 
     image_sortie = np.copy(image_np)
-    for ligne in range(nb_lignes):
-        for col in range(nb_colonnes):
-            for i in range(3):
-                image_sortie[ligne,col,i] = max(0, min(image_sortie[ligne,col,i]+valeur,255))
+    image_np = image_np.astype(np.float64)
+    image_sortie = image_sortie.astype(np.float64)
+    for i in range (0, valeur+1):
+        # Créé des images décalé de 1 pixel dans toutes les directions
+        image_decal_droite = np.concatenate((image_sortie[:, :1, :], image_sortie), axis=1)
+        image_decal_gauche = np.concatenate((image_sortie, image_sortie[:, -1:, :] ), axis=1)
+        image_decal_haut = np.concatenate((image_sortie[:1,:, :], image_sortie), axis=0)
+        image_decal_bas = np.concatenate((image_sortie, image_sortie[-1:,:, :]), axis=0)
+        # Fusionne toutes les images décalées
+        image_sortie = (image_decal_droite[:, :-1, :] + image_decal_gauche[:, 1:, :] + image_decal_haut[:-1, :, :] + image_decal_bas[1:, :, :])/4
+
     # Sauvegarde les images pour pouvoir les afficher
+    image_sortie = image_sortie.astype(np.uint8)
     Image.fromarray(image_sortie).save(f"temporaire\image_temporaire_{d.indice_temp}.png")
 
     # Charge l'image modifiée

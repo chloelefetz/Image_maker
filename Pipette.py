@@ -1,12 +1,11 @@
-import tkinter as tk
-from PIL import Image, ImageTk
+from PIL import Image
 import numpy as np
 
-def pipette(x, y, d):
+def pipette(x, y, text_pipette, d):
     """
     Permet de savoir les couleurs RVB d'un pixel aux coordonnées x et y
     """
-    image_entrée = Image.open("image_temporaire_{d - 1}.png")
+    image_entrée = Image.open(f"temporaire\image_temporaire_{d.indice_temp - 1}.png")
     image_np = np.asarray(image_entrée)
     couleur = image_np[y, x, :]
     r, v, b, a = couleur
