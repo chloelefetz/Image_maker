@@ -1,24 +1,30 @@
 from PIL import Image, ImageTk
 import tkinter as tk
 from globale import zoom
-from tkinter import filedialog
-from Info_image import info_image
+import numpy as np
 
 def choix_tampons(d):
-    file_path = filedialog.askopenfilename(initialdir="tampons/")
+    """
+    Ouvre la fenêtre pour choisir le fichier qui va servir de tampon
+    """
+    file_path = tk.filedialog.askopenfilename(initialdir="tampons/")
     d.choix = str(file_path)
 
 def boite_tampons(canvas, d):
     """
-    Créé une fenêtre "Symetrie verticale" avec un bouton valider qui lance la fonction symetrie_verticale
-    Cette fenêtre contient un exemple de l'utilité de la fonction
+    Créé une fenêtre "Collage" avec un bouton valider qui lance la fonction tampons\n
+    Cette fenêtre contient :\n
+    - un exemple de l'utilité de la fonction\n
+    - Le choix de l'image qui va servir de tampon \n
+    - Le choix de la taille du tampon \n
+    - L'emplcement du tampon est déterminé par l'emplacement du clic gauche sur le canvas
     """
 
     # création d'une nouvelle fenetre
     fenetre_collage = tk.Toplevel()
     fenetre_collage.title("Collage")
+    fenetre_collage.iconbitmap("image_logiciel\logo.ico")
     fenetre_collage.resizable(width=False, height=False)
-    fenetre_collage.geometry("560x280+50+650")
     fenetre_collage.attributes('-topmost', True)
 
     # choix du tampon
@@ -32,22 +38,19 @@ def boite_tampons(canvas, d):
     bouton_choix.pack()
 
     # choix taille du tampon
-
-    text_longeur = tk.Label(fenetre_collage, text="2) Choissisez la longeur de votre tampon : ")
-    text_longeur.pack()
-    longeur = tk.Entry(fenetre_collage)
-    longeur.pack()
+    text_hauteur = tk.Label(fenetre_collage, text="2) Choissisez la hauteur de votre tampon : ")
+    text_hauteur.pack()
+    hauteur = tk.Entry(fenetre_collage)
+    hauteur.pack()
     a = tk.Label(fenetre_collage, text="Choissisez la largeur de votre tampon :")
     a.pack()    
     largeur = tk.Entry(fenetre_collage)
     largeur.pack() 
-    # text_emplacement = tk.Label(fenetre_collage, text="3) Choissisez la position du tampon en effectuant un click gauche de la souris sur l'image : ")
-    # text_emplacement.pack()
 
-    # Création d'une frame 
+    # Création de la frame pour pouvoir avoir une image et du texte côte à côte  
     frame1 = tk.Frame(fenetre_collage)
     frame1.pack(padx=3, pady=3)
-    img1 = Image.open("image_logitiel\clic_gauche.png").convert("RGBA")
+    img1 = Image.open("image_logiciel\clic_gauche.png").convert("RGBA")
     img_exemple1 = ImageTk.PhotoImage(img1)
     # Créer un label pour afficher l'image du clic gauche
     image_label1 = tk.Label(frame1, image=img_exemple1)
@@ -57,49 +60,89 @@ def boite_tampons(canvas, d):
     texte_label1 = tk.Label(frame1, text=texte1)
     texte_label1.pack(side=tk.LEFT, padx=3, pady=3)
 
-
     # Création d'un bouton valider
-    bouton_valider = tk.Button(fenetre_collage, text="Valider", command=lambda:(tampons(canvas, d, longeur, largeur), fenetre_collage.destroy()))
+    bouton_valider = tk.Button(fenetre_collage, text="Valider", command=lambda:(tampons(canvas, d, hauteur, largeur), fenetre_collage.destroy()))
     bouton_valider.pack()
-    fenetre_collage.mainloop()
 
     # Charger une image d'exemple
-    # img = Image.open("image_logitiel\chiens_sym_verticale.png").convert("RGBA")
-    # img_exemple = ImageTk.PhotoImage(img)
-
+    img = Image.open("image_logiciel\sportif_tampon.png").convert("RGBA")
+    img_exemple = ImageTk.PhotoImage(img)
     # Créer un label pour afficher l'image exemple
-    # image_label = tk.Label(fenetre_collage, image=img_exemple)
-    # image_label.pack()
+    image_label = tk.Label(fenetre_collage, image=img_exemple)
+    image_label.pack()
+
+    fenetre_collage.mainloop()
     
 
-
-def tampons(canvas, d, longeur, largeur):
+def tampons(canvas, d, hauteur, largeur):
     """
-    
+    Remplace les valeurs de l'image d'entrée par celle de l'image tampon à l'endroit où le tampon doit apparaitre \n
+    Tient compte de la transparence du tampon \n
+    Tient compte des zones du tampon qui depassent de l'image d'entrée
     """
     global photo
+
+    # Récupère la largeur et hauteur du tampon sous forme de chiffre 
+    hauteur = int(hauteur.get())
+    largeur = int(largeur.get())
     # Charge l'image ouverte par la fonction ouvrir_image
-    image_entrée = Image.open(f"temporaire\image_temporaire_{d.indice_temp - 1}.png")
-
+    image = Image.open(f"temporaire\image_temporaire_{d.indice_temp - 1}.png").convert("RGBA")
     image2 = Image.open(d.choix).convert("RGBA")
-    image = image_entrée.convert("RGBA")
-    image2 = image2.resize((int(longeur.get()),int(largeur.get())))
+    image2 = image2.resize((hauteur,largeur), Image.Resampling.LANCZOS)
 
+    # Crée des tableaux numpy avec l'image et le tampon
+    image_np = np.asarray(image)
+    image_sortie = np.copy(image_np)
+    tampon = np.asarray(image2)
+    image2_np = np.copy(tampon)
 
-    image.alpha_composite(image2, dest=(d.x1 - image2.width // 2, d.y1 - image2.height // 2))
+    # Calcul les coordonnées où commence et fini le tampon
+    debut_x = d.x1-hauteur//2
+    debut_y = d.y1-largeur//2
+    fin_x = debut_x + largeur
+    fin_y = debut_y + hauteur
+
+    if debut_x < 0 :
+        image2_np = image2_np[:, abs(debut_x):]
+        debut_x = 0
+    
+    if debut_y < 0 :
+        image2_np = image2_np[abs(debut_y):,:]
+        debut_y = 0
+    
+    if fin_x > image.width-1 :
+        image2_np = image2_np[:, :image.width - fin_x]
+        fin_x = image.width
+    
+    if fin_y > image.height-1 :
+        image2_np = image2_np[:image.height - fin_y,:]
+        fin_y = image.height
+
+    # Calcul l'image finiale en tenant compte de la transparence
+    image_temporaire = image_np[debut_y : fin_y, debut_x : fin_x,:]
+    image_transparence = image2_np[:,:,3]/255
+    image_resultat = np.empty(image2_np.shape)
+    image_resultat[:,:,0] = image_temporaire[:,:,0]*(1-image_transparence)+image2_np[:,:,0]*image_transparence
+    image_resultat[:,:,1] = image_temporaire[:,:,1]*(1-image_transparence)+image2_np[:,:,1]*image_transparence
+    image_resultat[:,:,2] = image_temporaire[:,:,2]*(1-image_transparence)+image2_np[:,:,2]*image_transparence
+    image_resultat[:,:,3] = np.maximum(image2_np[:,:,3], image_temporaire[:,:,3])
+    
+    image_sortie[debut_y : fin_y, debut_x : fin_x,:] = image_resultat
 
     # Sauvegarde les images pour pouvoir les afficher
-    image.save(f"temporaire\image_temporaire_{d.indice_temp}.png")
+    Image.fromarray(image_sortie).save(f"temporaire\image_temporaire_{d.indice_temp}.png")
+    
+    # Charge l'image modifiée
     image_entrée = Image.open(f"temporaire\image_temporaire_{d.indice_temp}.png")
 
     # grille de transparence image png
-    grille = Image.open('image_logitiel\grille.png')
+    grille = Image.open('image_logiciel\grille.png')
     image_entrée = image_entrée.convert("RGBA")
     grille = grille.convert("RGBA").resize(image_entrée.size)
-
     # Superposer l'image sur la grille
     image_entrée = Image.alpha_composite(grille, image_entrée)
 
+    # Affiche le résultat final avec le zoom et la grille
     canvas.delete("all")
     largeur_image = int(image_entrée.width*zoom[0])
     hauteur_image = int(image_entrée.height*zoom[0])
@@ -113,20 +156,26 @@ def tampons(canvas, d, longeur, largeur):
 
 
 def choix_fond(d):
-    file_path = filedialog.askopenfilename(initialdir="fond/")
+    """
+    Ouvre la fenêtre pour choisir le fichier qui va servir de fond
+    """
+    file_path = tk.filedialog.askopenfilename(initialdir="fond/")
     d.choix = str(file_path)
 
 def boite_fond(canvas, d):
     """
-    Créé une fenêtre "Symetrie verticale" avec un bouton valider qui lance la fonction symetrie_verticale
-    Cette fenêtre contient un exemple de l'utilité de la fonction
+    Créé une fenêtre "Choix fond" \n
+    Elle contient : \n
+    - Un bouton pour choisir l'image à mettre en fond\n
+    - Un bouton valider qui lance la fonction fond\n
+    - Un exemple de l'utilité de la fonction
     """
 
     # création d'une nouvelle fenetre
     fenetre_collage = tk.Toplevel()
-    fenetre_collage.title("Collage")
+    fenetre_collage.title("Choix fond")
+    fenetre_collage.iconbitmap("image_logiciel\logo.ico")
     fenetre_collage.resizable(width=False, height=False)
-    fenetre_collage.geometry("550x170+50+650")
     fenetre_collage.attributes('-topmost', True)
 
     # choix du fond
@@ -139,39 +188,64 @@ def boite_fond(canvas, d):
     bouton_choix = tk.Button(fenetre_collage, text="choix", command=lambda:(choix_fond(d), choix.set(f"{d.choix}")))
     bouton_choix.pack()
 
-
     # Création d'un bouton valider
     bouton_valider = tk.Button(fenetre_collage, text="Valider", command=lambda:(fond(canvas, d), fenetre_collage.destroy()))
     bouton_valider.pack()
-    fenetre_collage.mainloop()
-
+    
     # Charger une image d'exemple
-    # img = Image.open("image_logitiel\chiens_sym_verticale.png").convert("RGBA")
-    # img_exemple = ImageTk.PhotoImage(img)
-
+    img = Image.open("image_logiciel\sportif_fond.png").convert("RGBA")
+    img_exemple = ImageTk.PhotoImage(img)
     # Créer un label pour afficher l'image exemple
-    # image_label = tk.Label(fenetre_collage, image=img_exemple)
-    # image_label.pack()
+    image_label = tk.Label(fenetre_collage, image=img_exemple)
+    image_label.pack()
+
+    fenetre_collage.mainloop()
     
 
 
 def fond(canvas, d):
     """
-    
+    Remplace les pixels de l'image par ceux du fond là où l'image est transparente\n
+    Ajuste les dimmentions du fond
     """
     global photo
-    # Charge l'image ouverte par la fonction ouvrir_image
-    image_entrée = Image.open(f"temporaire\image_temporaire_{d.indice_temp - 1}.png")
 
-    image2 = Image.open(f"{d.choix}")
-    image_entrée = image_entrée.convert("RGBA")
-    image2 = image2.convert("RGBA").resize(image_entrée.size)
-    image = Image.alpha_composite(image2, image_entrée)
+    # Charge l'image ouverte par la fonction ouvrir_image
+    image = Image.open(f"temporaire\image_temporaire_{d.indice_temp - 1}.png").convert("RGBA")
+    image2 = Image.open(d.choix).convert("RGBA")
+    image2 = image2.resize((image.height, image.width), Image.Resampling.LANCZOS)
+
+    # Crée des tableaux numpy avec l'image et le fond
+    image_np = np.asarray(image)
+    image_sortie = np.copy(image_np)
+    fond = np.asarray(image2)
+    image2_np = np.copy(fond)
+
+    # Calcul l'image finiale en tenant compte de la transparence
+    image_transparence = image_np[:,:,3]/255
+    image_resultat = np.empty(image2_np.shape)
+    image_resultat[:,:,0] = image_sortie[:,:,0]*image_transparence+image2_np[:,:,0]*(1-image_transparence)
+    image_resultat[:,:,1] = image_sortie[:,:,1]*image_transparence+image2_np[:,:,1]*(1-image_transparence)
+    image_resultat[:,:,2] = image_sortie[:,:,2]*image_transparence+image2_np[:,:,2]*(1-image_transparence)
+    image_resultat[:,:,3] = np.maximum(image2_np[:,:,3], image_sortie[:,:,3])
+
+    image_sortie = image_resultat
 
     # Sauvegarde les images pour pouvoir les afficher
-    image.save(f"temporaire\image_temporaire_{d.indice_temp}.png")
+    image_sortie = (image_sortie).astype(np.uint8)
+    Image.fromarray(image_sortie).save(f"temporaire\image_temporaire_{d.indice_temp}.png")
+    
+    # Charge l'image modifiée
     image_entrée = Image.open(f"temporaire\image_temporaire_{d.indice_temp}.png")
 
+    # grille de transparence image png
+    grille = Image.open('image_logiciel\grille.png')
+    image_entrée = image_entrée.convert("RGBA")
+    grille = grille.convert("RGBA").resize(image_entrée.size)
+    # Superposer l'image sur la grille
+    image_entrée = Image.alpha_composite(grille, image_entrée)
+
+    # Affiche le résultat final avec le zoom et la grille
     canvas.delete("all")
     largeur_image = int(image_entrée.width*zoom[0])
     hauteur_image = int(image_entrée.height*zoom[0])
