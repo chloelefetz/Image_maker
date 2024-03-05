@@ -14,6 +14,7 @@ def boite_transparence(canvas, d):
     # Création d'une nouvelle fenêtre
     fenetre_transparence = tk.Toplevel()
     fenetre_transparence.title("Transparence")
+    fenetre_transparence.iconbitmap("image_logiciel\logo.ico")
     fenetre_transparence.resizable(width=False, height=False)
 
     # Création d'un bouton valider
