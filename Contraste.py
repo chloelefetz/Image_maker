@@ -12,6 +12,7 @@ def boite_contraste(canvas, d):
     # Création d'une nouvelle fenetre tkinter
     fenetre_contraste = tk.Toplevel()
     fenetre_contraste.title("Modifier le contraste")
+    fenetre_contraste.iconbitmap("image_logiciel\logo.ico")
     fenetre_contraste.resizable(width=False, height=False)
     
     # Créé une zone pour ecrire un nombre
@@ -101,5 +102,3 @@ def on_slider_change(event, chiffre_entry):
     value = event.widget.get()
     chiffre_entry.delete(0, tk.END)  # Supprime le texte actuel dans l'Entry
     chiffre_entry.insert(0, str(value))  # Ajoute la nouvelle valeur dans l'Entry
-
-    
