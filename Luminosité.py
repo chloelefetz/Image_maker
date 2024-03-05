@@ -13,6 +13,7 @@ def boite_luminosite(canvas, d):
     # Création d'une nouvelle fenetre tkinter
     fenetre_luminosité = tk.Toplevel()
     fenetre_luminosité.title("Modifier la luminosité")
+    fenetre_luminosité.iconbitmap("image_logiciel\logo.ico")
     fenetre_luminosité.resizable(width=False, height=False)
 
     # Créé une zone pour ecrire un nombre et un slider
