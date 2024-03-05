@@ -13,6 +13,7 @@ def boite_pixeliser(canvas, d):
     # Création d'une nouvelle fenetre tkinter
     fenetre_pixeliser = tk.Toplevel()
     fenetre_pixeliser.title("Block de pixels")
+    fenetre_pixeliser.iconbitmap("image_logiciel\logo.ico")
     fenetre_pixeliser.resizable(width=False, height=False)
     
     # Créé une zone pour ecrire un nombre et un slider
