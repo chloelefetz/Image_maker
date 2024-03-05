@@ -15,7 +15,6 @@ from transparence import boite_transparence
 from Info_image import info_image
 from collage import boite_tampons, boite_fond
 from Retour import *
-from Rotation import rotation
 from os import remove, path
 from PIL import Image, ImageTk
 from supprimer_selection import boite_supprimer
@@ -115,17 +114,17 @@ frame_infos = tk.Frame(window, bg="darkgray", bd=0, highlightthickness=0)
 frame_infos.grid(row=2, column=2, sticky="nse", padx=0, pady=0)
 
 #Ajout de texte dans frame outils et frame informations
-text_outil = tk.Label(frame_outil, text = "Barre d'outils", font=("Arial", 10), fg="black", width=20)
+text_outil = tk.Label(frame_outil, text = "\n Barre d'outils \n", font=("Arial", 10, "bold", "underline"), fg="black", width=20, bg="darkgray")
 text_outil.pack()
-text_infos = tk.Label(frame_infos, text = "Informations", font=("Arial", 10), fg="black", width=20)
+text_infos = tk.Label(frame_infos, text = "\n Informations", font=("Arial", 10, "bold", "underline"), fg="black", width=20, bg="darkgray")
 text_infos.pack()
-text_resolution = tk.Label(frame_infos, text = "\nRésolution\nLargeur : nd\nHauteur : nd", font=("Arial", 10), fg="black", width=20)
+text_resolution = tk.Label(frame_infos, text = "\nRésolution\nLargeur : nd\nHauteur : nd", font=("Arial", 10), fg="black", width=20, bg="darkgray")
 text_resolution.pack()
-text_selectionG = tk.Label(frame_infos, text = "\nCoordonnées clique gauche\nx : nd / y : nd", font=("Arial", 10), fg="black", width=20)
+text_selectionG = tk.Label(frame_infos, text = "\nCoordonnées clique gauche\nx : nd / y : nd", font=("Arial", 10), fg="black", width=20, bg="darkgray")
 text_selectionG.pack()
-text_selectionD = tk.Label(frame_infos, text = "\nCoordonnées clique droit\nx : nd / y : nd", font=("Arial", 10), fg="black", width=20)
+text_selectionD = tk.Label(frame_infos, text = "\nCoordonnées clique droit\nx : nd / y : nd", font=("Arial", 10), fg="black", width=20, bg="darkgray")
 text_selectionD.pack()
-text_pipette = tk.Label(frame_infos, text = "\nCouleur selectionnée\nR : nd\nV : nd\nB : nd\nA : nd", font=("Arial", 10), fg="black", width=20)
+text_pipette = tk.Label(frame_infos, text = "\nCouleur selectionnée\nR : nd\nV : nd\nB : nd\nA : nd", font=("Arial", 10), fg="black", width=20, bg="darkgray")
 text_pipette.pack()
 
 # Insertion image décorative d'un bouton directionnel
@@ -185,7 +184,7 @@ menuCollage.add_command(label="Tampon", command=lambda:boite_tampons(canvas, d))
 menuCollage.add_command(label="Fond", command=lambda:boite_fond(canvas, d))
 menuEffets.add_command(label="Pixeliser", command=lambda:boite_pixeliser(canvas, d))
 menuEffets.add_command(label="Flouter", command=lambda:boite_flouter(canvas, d))
-menuPosition.add_command(label="Rotation",  command=lambda:rotation(canvas, d)) 
+menuPosition.add_command(label="Rotation",  command=lambda:boite_rotation(canvas, d)) 
 menuPosition.add_command(label="Miroir vertical", command=lambda:boite_miroir_vertical(canvas, d))
 menuPosition.add_command(label="Miroir horizontal", command=lambda:boite_miroir_horizontal(canvas, d))
 menuPosition.add_command(label="Symetrie centrale", command=lambda:boite_symetrie_centrale(canvas, d))
@@ -199,34 +198,34 @@ window.config(menu=menuBar)
 # Créations des boutons dans la frame outils
 image_retour = Image.open("image_logiciel\_fleche_retour.png")
 photo_retour = ImageTk.PhotoImage(image_retour)
-button_collage = tk.Button(frame_outil, text = " Retour", image=photo_retour, compound=tk.LEFT, width=150, command=lambda:retour_arriere(canvas, d))
+button_collage = tk.Button(frame_outil, text = " Retour", image=photo_retour, compound=tk.LEFT, width=150, bg="lightgray", anchor = "w", command=lambda:retour_arriere(canvas, d))
 button_collage.pack()
 image_retour_debut = Image.open("image_logiciel\_fleche_retour_debut.png")
 photo_retour_debut = ImageTk.PhotoImage(image_retour_debut)
-button_collage = tk.Button(frame_outil, text = "Retour début", image=photo_retour_debut, compound=tk.LEFT, width=150, command=lambda:retour_debut(canvas, d))
+button_collage = tk.Button(frame_outil, text = " Revenir à l'originale", image=photo_retour_debut, compound=tk.LEFT, width=150, bg="lightgray", anchor = "w", command=lambda:retour_debut(canvas, d))
 button_collage.pack()
 image_rogner = Image.open("image_logiciel\_rogner.png")
 photo_rogner = ImageTk.PhotoImage(image_rogner)
-button_rogner = tk.Button(frame_outil, text = "Rogner", image=photo_rogner, compound=tk.LEFT, width=150, command=lambda:boite_rogner_image(canvas, d))
+button_rogner = tk.Button(frame_outil, text = " Rogner", image=photo_rogner, compound=tk.LEFT, width=150, bg="lightgray", anchor = "w", command=lambda:boite_rogner_image(canvas, d))
 button_rogner.pack()
 image_supprimer_selection = Image.open("image_logiciel\_supprimer.png")
 photo_supprimer_selection = ImageTk.PhotoImage(image_supprimer_selection)
-button_supprimer_selection = tk.Button(frame_outil, text = "Supprimer séléction", image=photo_supprimer_selection, compound=tk.LEFT, width=150, command=lambda:boite_supprimer(canvas, d))
+button_supprimer_selection = tk.Button(frame_outil, text = " Supprimer la séléction", image=photo_supprimer_selection, compound=tk.LEFT, width=150, bg="lightgray", anchor = "w", command=lambda:boite_supprimer(canvas, d))
 button_supprimer_selection.pack()
 image_flouter = Image.open("image_logiciel\_flouter.png")
 photo_flouter = ImageTk.PhotoImage(image_flouter)
-button_flouter = tk.Button(frame_outil, text = "Flouter séléction", image=photo_flouter, compound=tk.LEFT, width=150, command=lambda:boite_flouter_selection(canvas, d))
+button_flouter = tk.Button(frame_outil, text = " Flouter la séléction", image=photo_flouter, compound=tk.LEFT, width=150, bg="lightgray", anchor = "w", command=lambda:boite_flouter_selection(canvas, d))
 button_flouter.pack()
 
 
 # Création d'un slider pour régler le zoom de l'image 
-slider = tk.Scale(frame_outil, from_=50, to=200, orient="horizontal", bg="darkgray", bd=0, highlightthickness=0)
+slider = tk.Scale(frame_outil, from_=10, to=200, orient="horizontal", bg="darkgray", bd=0, highlightthickness=0)
 slider.pack(padx=10, pady=(0, 30), side="bottom")
-label_zoom = tk.Label(frame_outil, text="Zoom : ", bg="darkgray")
+label_zoom = tk.Label(frame_outil, text="Zoom : ", bg="darkgray", font=("Arial", 10, "bold", "underline"))
 label_zoom.pack(side="bottom")
 slider.set(100)
 slider.bind("<ButtonRelease-1>", lambda event: on_entry_change(event, canvas, d)) # <ButtonRelease-1> = l'utilisateur relache le bouton 1
 
 # ------------------------------------------ Affichage de la fenêtre window ------------------------------------------
 
-window.mainloop() 
+window.mainloop()
