@@ -15,6 +15,7 @@ def boite_supprimer(canvas, d) :
     # Création d'une nouvelle fenetre tkinter
     fenetre_supprimer = tk.Toplevel()
     fenetre_supprimer.title("Supprimer la séléction")
+    fenetre_supprimer.iconbitmap("image_logiciel\logo.ico")
     fenetre_supprimer.resizable(width=False, height=False)
 
     # Création du bouton valider 
