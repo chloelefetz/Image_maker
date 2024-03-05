@@ -16,6 +16,7 @@ def boite_flouter(canvas, d):
     # Création d'une nouvelle fenetre tkinter
     fenetre_flouter = tk.Toplevel()
     fenetre_flouter.title("Flouter")
+    fenetre_flouter.iconbitmap("image_logiciel\logo.ico")
     fenetre_flouter.resizable(width=False, height=False)
     ajouter_bouton = tk.Button(fenetre_flouter, text="Valider", command=lambda:(flouter_image(canvas, chiffre_entry, d), fenetre_flouter.destroy()))
     ajouter_bouton.pack()
