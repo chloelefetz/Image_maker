@@ -14,6 +14,7 @@ def boite_redimentionner(canvas, text_resolution, d):
     # Création d'une nouvelle fenetre tkinter
     fenetre_redimentionner = tk.Toplevel()
     fenetre_redimentionner.title("Modifier les dimentions de l'image")
+    fenetre_redimentionner.iconbitmap("image_logiciel\logo.ico")
     
     # Regarde si le fichier "image_temporaire.png" existe
     if os.path.exists(f"temporaire\image_temporaire_{d.indice_temp - 1}.png"):
@@ -148,4 +149,3 @@ def redimentionner_image(canvas, vertical_entry, horizontal_entry, image_entrée
     canvas.config(width=largeur_image, height=hauteur_image, borderwidth=0, highlightthickness=0)
     canvas.create_image(0, 0, anchor=tk.NW, image=photo)
     d.indice_temp += 1
-    
