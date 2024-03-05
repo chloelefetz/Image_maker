@@ -2,20 +2,64 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import numpy as np
 import os
+from globale import zoom
 
-def redimentionner_image(canvas, vertical_entry, horizontal_entry, image_entrée):
+def boite_redimentionner(canvas, text_resolution, d):
     """
-    Permet de redimentionner une image 
-    Ouvre image_temporaire.png
-    Transforme l'image en tableau a trois dimention
-    Change le nombre de pixels de l'image -> agrandissement ou retrecissement
+    Creation une nouvelle fenêtre tkinter : "Modifier les dimentions de l'image"\n
+    Elle contient : \n
+    - Des champs pour écrire la hauteur et la largeur\n 
+    - Un bouton Valider qui appel la fonction redimentionner_image
+    """ 
+    # Création d'une nouvelle fenetre tkinter
+    fenetre_redimentionner = tk.Toplevel()
+    fenetre_redimentionner.title("Modifier les dimentions de l'image")
+    
+    # Regarde si le fichier "image_temporaire.png" existe
+    if os.path.exists(f"temporaire\image_temporaire_{d.indice_temp - 1}.png"):
+        image_entrée = Image.open(f"temporaire\image_temporaire_{d.indice_temp - 1}.png")
+        largeur, hauteur = image_entrée.size # Récupère la largeur et hauteur de l'image  
+    else : 
+        largeur, hauteur = 0, 0 
+    # Créé une zone pour ecrire la largeur souhaitée
+    label_largeur = tk.Label(fenetre_redimentionner, text="LARGEUR : ")
+    label_largeur.pack()
+    vertical_entry = tk.Entry(fenetre_redimentionner)
+    vertical_entry.pack()
+    vertical_entry.insert(0, str(largeur))
+    # Créé une zone pour ecrire la hauteur souhaitée
+    label_hauteur = tk.Label(fenetre_redimentionner, text="HAUTEUR : ")
+    label_hauteur.pack()
+    horizontal_entry = tk.Entry(fenetre_redimentionner)
+    horizontal_entry.pack()
+    horizontal_entry.insert(0, str(hauteur))
+
+    # Création du bouton Valider
+    ajouter_bouton = tk.Button(fenetre_redimentionner, text="Valider", command=lambda:(redimentionner_image(canvas, vertical_entry, horizontal_entry, image_entrée, text_resolution, d), fenetre_redimentionner.destroy()))
+    ajouter_bouton.pack()
+
+    # Charger une image d'exemple
+    img = Image.open("image_logiciel\sportif_redimentionner.png").convert("RGBA")
+    img_exemple = ImageTk.PhotoImage(img)
+    # Créer un label pour afficher l'image exemple
+    image_label = tk.Label(fenetre_redimentionner, image=img_exemple)
+    image_label.pack()
+    
+    fenetre_redimentionner.mainloop()
+
+def redimentionner_image(canvas, vertical_entry, horizontal_entry, image_entrée, text_resolution, d):
+    """
+    Permet de redimentionner une image \n
+    Ouvre image_temporaire.png\n
+    Transforme l'image en tableau a trois dimention\n
+    Change le nombre de pixels de l'image -> agrandissement ou rétrécissement\n
     Sauvegarde le resultat dans image_temporaire.png
     """
     global photo
     # Recupère le chiffre entré précedement
     valeur_vertical = int(vertical_entry.get())
     valeur_horizontal = int(horizontal_entry.get())
-    # Charge l'image ouverte par la fonction ouvrir_image et la transforme en tableau couleurs
+    # Charge l'image ouverte par la fonction ouvrir_image et la transforme en tableau numpy
     image_np = np.asarray(image_entrée)  
     nb_lignes, nb_colonnes, _ = image_np.shape 
     # Créé l'image de sortie sous forme de tableau numpy 
@@ -80,44 +124,28 @@ def redimentionner_image(canvas, vertical_entry, horizontal_entry, image_entrée
 
     # Sauvegarde les images pour pouvoir les afficher
     image_sortie = image_sortie.astype(np.uint8)
-    Image.fromarray(image_sortie).save("image_temporaire.png")
+    Image.fromarray(image_sortie).save(f"temporaire\image_temporaire_{d.indice_temp}.png")
+
+    # Charge l'image modifiée
+    image_entrée = Image.open(f"temporaire\image_temporaire_{d.indice_temp}.png")
+
+    # grille de transparence image png
+    grille = Image.open('image_logiciel\grille.png')
+    image_entrée = image_entrée.convert("RGBA")
+    grille = grille.convert("RGBA").resize(image_entrée.size)
+    # Superposer l'image sur la grille
+    image_entrée = Image.alpha_composite(grille, image_entrée)
+
+    # Affiche le résultat final avec le zoom et la grille
     canvas.delete("all")
-    photo = ImageTk.PhotoImage(file="image_temporaire.png")
-    largeur_image = photo.width()
-    hauteur_image = photo.height()
-    canvas.config(width=largeur_image, height=hauteur_image)
+    largeur_image = int(image_entrée.width*zoom[0])
+    hauteur_image = int(image_entrée.height*zoom[0])
+    resized_image = image_entrée.resize((largeur_image, hauteur_image), Image.Resampling.LANCZOS)
+    photo = ImageTk.PhotoImage(resized_image)
+    # Modifie le texte de la hauteur et largeur de l'image dans la frame information
+    nouveau_texte = "\nRésolution\nLargeur : " + str(photo.width()) + "px\nHauteur : " + str(photo.height()) + "px"
+    text_resolution.config(text=nouveau_texte)
+    canvas.config(width=largeur_image, height=hauteur_image, borderwidth=0, highlightthickness=0)
     canvas.create_image(0, 0, anchor=tk.NW, image=photo)
-
-def boite_redimentionner(canvas):
-    """
-    Cration une nouvelle page tkinter (fenetre_redimentionner)
-    Créé un champ pour ecrire un nombre (hauteur et largeur) 
-    Bouton Valider qui appel la fonction luminosite_image
-    """ 
-    # Création d'une nouvelle fenetre tkinter
-    fenetre_redimentionner = tk.Tk()
-    fenetre_redimentionner.title("Modifier les dimentions de l'image")
-    # cmd = fenetre_luminosité.register(lambda s: not s or s.isdigit())
-    # Regarde si le fichier "image_temporaire.png" existe
-    if os.path.exists("image_temporaire.png"):
-        image_entrée = Image.open("image_temporaire.png")
-        largeur, hauteur = image_entrée.size # Récupère la largeur et hauteur de l'image  
-    else : 
-        largeur, hauteur = 0, 0 
-    # Créé une zone pour ecrire un nombre
-    label_largeur = tk.Label(fenetre_redimentionner, text="LARGEUR : ")
-    label_largeur.pack()
-    vertical_entry = tk.Entry(fenetre_redimentionner)
-    vertical_entry.pack()
-    vertical_entry.insert(0, str(largeur))
-    label_hauteur = tk.Label(fenetre_redimentionner, text="HAUTEUR : ")
-    label_hauteur.pack()
-    horizontal_entry = tk.Entry(fenetre_redimentionner)
-    horizontal_entry.pack()
-    horizontal_entry.insert(0, str(hauteur))
-
-    # Création du bouton Valider
-    ajouter_bouton = tk.Button(fenetre_redimentionner, text="Valider", command=lambda:redimentionner_image(canvas, vertical_entry, horizontal_entry, image_entrée))
-    ajouter_bouton.pack()
+    d.indice_temp += 1
     
-    fenetre_redimentionner.mainloop()

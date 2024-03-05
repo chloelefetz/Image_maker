@@ -1,76 +1,77 @@
-import tkinter as tk
 from PIL import Image, ImageTk
 import numpy as np
+import tkinter as tk
 from globale import zoom
 
-def boite_pixeliser(canvas, d):
+def boite_transparence(canvas, d):
     """
-    Création d'une nouvelle fenêtre tkinter "Block de pixels"\n
-    Elle contient : 
-    - Un champ pour ecrire un nombre et un slider lié au champ \n
-    - un bouton Valider qui appel la fonction pixeliser_image
-    """ 
-    # Création d'une nouvelle fenetre tkinter
-    fenetre_pixeliser = tk.Toplevel()
-    fenetre_pixeliser.title("Block de pixels")
-    fenetre_pixeliser.resizable(width=False, height=False)
+    Créé une fenêtre "Transparence" \n
+    Elle contient : \n
+    - Un bouton valider qui lance la fonction transparence_image\n
+    - Une zone pour entrer un nombre lié à un slider\n
+    - Un exemple de l'utilité de la fonction
+    """
+    # Création d'une nouvelle fenêtre
+    fenetre_transparence = tk.Toplevel()
+    fenetre_transparence.title("Transparence")
+    fenetre_transparence.resizable(width=False, height=False)
+
+    # Création d'un bouton valider
+    ajouter_bouton = tk.Button(fenetre_transparence, text="Valider", command=lambda:(transparence_image(canvas, chiffre_entry, d), fenetre_transparence.destroy()))
+    ajouter_bouton.pack()
     
-    # Créé une zone pour ecrire un nombre et un slider
-    cmd = fenetre_pixeliser.register(lambda s: not s or s.isdigit())
-    chiffre_entry = tk.Entry(fenetre_pixeliser, validatecommand=(cmd, "%P"))
+    # Création d'une zone pour entrer un chiffre et d'un slider
+    chiffre = tk.StringVar()
+    chiffre_entry = tk.Entry(fenetre_transparence, textvariable=chiffre)
     chiffre_entry.pack()
-    slider = tk.Scale(fenetre_pixeliser, from_=0, to=255, orient="horizontal")
+    chiffre_entry.insert(0, str(0))
+    slider = tk.Scale(fenetre_transparence, from_=0, to=100, orient="horizontal")
     slider.pack(padx=0, pady=0)
     slider.set(0)
 
-    # Création du bouton valider
-    ajouter_bouton = tk.Button(fenetre_pixeliser, text="Valider", command=lambda:(pixeliser_image(canvas, chiffre_entry, d), fenetre_pixeliser.destroy()))
-    ajouter_bouton.pack()
-
-
+    # Mise en place du slider
     slider.bind("<B1-Motion>", lambda event: on_slider_change(event, chiffre_entry)) # <B1-Motion> = Mouvement souris avec bouton 1/gauche enfoncé
     slider.bind("<ButtonRelease-1>", lambda event: on_slider_change(event, chiffre_entry)) # <ButtonRelease-1> = l'utilisateur relache le bouton 1
     chiffre_entry.bind("<Return>", lambda event: on_entry_change(event, slider)) # <Return> = L'utilisateur appuie sur entrer
 
     # Charger une image d'exemple
-    img = Image.open("image_logiciel\sportif_pixeliser.png").convert("RGBA")
+    img = Image.open("image_logiciel\sportif_transparence.png").convert("RGBA")
     img_exemple = ImageTk.PhotoImage(img)
     # Créer un label pour afficher l'image exemple
-    image_label = tk.Label(fenetre_pixeliser, image=img_exemple)
+    image_label = tk.Label(fenetre_transparence, image=img_exemple)
     image_label.pack()
 
-    fenetre_pixeliser.mainloop() 
+    fenetre_transparence.mainloop()
 
-def pixeliser_image(canvas, chiffre_entry, d):
+
+def transparence_image(canvas, chiffre_entry, d):
     """
-    Permet de pixeliser une image \n
-    Ouvre image_temporaire.png\n
-    Transforme l'image en tableau a trois dimention\n
-    Divise l'image en block de pixels et fait la moyenne de leurs couleurs\n
-    Sauvegarde le resultat dans image_temporaire.png
+    Permet de rendre transparent le couleur choisi par le clic gauche sur l'image avec une marge de tolérence choisi par l'utilisateur
     """
     global photo
-    # Recupère le chiffre entré précedement
     valeur = int(chiffre_entry.get())
     # Charge l'image ouverte par la fonction ouvrir_image et la transforme en tableau couleurs
     image_entrée = Image.open(f"temporaire\image_temporaire_{d.indice_temp - 1}.png")
     image_np = np.asarray(image_entrée)
-    nb_lignes, nb_colonnes, _ = image_np.shape 
-    # Créé l'image de sortie sous forme de tableau numpy 
+    couleur = image_np[d.y1, d.x1, :]
+    r, v, b, a = couleur
+    # Determine le minimum et la maximum pour chaque canal de couleur
+    min_r = r * (1-valeur/100)
+    max_r = r * (1+valeur/100)
+    min_v = v * (1-valeur/100)
+    max_v = v * (1+valeur/100)
+    min_b = b * (1-valeur/100)
+    max_b = b * (1+valeur/100) 
+
+    # Créé l'image de sortie sous forme de tableau numpy
     image_sortie = np.copy(image_np)
-    image_np = image_np.astype(np.float64)
-    image_sortie = image_sortie.astype(np.float64)
-    for ligne in range(0, nb_lignes, valeur):
-        for col in range(0, nb_colonnes, valeur):
-            for i in range(3):
-                a = image_np[ligne:ligne+valeur, col:col+valeur, i]
-                b = np.mean(a) #Fait la moyenne des couleurs des pixels compris dans le block à pixeliser
-                image_sortie[ligne:ligne+valeur, col:col+valeur, i] = b
-            if np.any(image_sortie[ligne:ligne+valeur, col:col+valeur, 3] > 0): 
-                #Met l'oppacité de tous les pixels compris dans la block a pixeliser à 255
-                image_sortie[ligne:ligne+valeur, col:col+valeur, 3] = 255 
+
+    # Créé un masque qui renvoie True dans les zones qui répondent à nos critères
+    condition = (image_sortie[:, :, 0] <= max_r) & (image_sortie[:, :, 1] <= max_v) & (image_sortie[:, :, 2] <= max_b) & (image_sortie[:, :, 0] >= min_r) & (image_sortie[:, :, 1] >= min_v) & (image_sortie[:, :, 2] >= min_b)
+    # Met à 0 le canal alpha dans les zones où le masque est à True
+    image_sortie[:,:,3][condition] = 0
+
     # Sauvegarde les images pour pouvoir les afficher
-    image_sortie = image_sortie.astype(np.uint8)
     Image.fromarray(image_sortie).save(f"temporaire\image_temporaire_{d.indice_temp}.png")
 
     # Charge l'image modifiée
@@ -91,8 +92,7 @@ def pixeliser_image(canvas, chiffre_entry, d):
     photo = ImageTk.PhotoImage(resized_image)
     canvas.config(width=largeur_image, height=hauteur_image, borderwidth=0, highlightthickness=0)
     canvas.create_image(0, 0, anchor=tk.NW, image=photo)
-    d.indice_temp += 1
-
+    d.indice_temp += 1 
 
 def on_entry_change(event, slider):
     """
