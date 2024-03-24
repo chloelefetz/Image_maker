@@ -83,12 +83,12 @@ def tampons(canvas, d, hauteur, largeur):
     global photo
 
     # Récupère la largeur et hauteur du tampon sous forme de chiffre 
+    largeur = int(largeur.get())    
     hauteur = int(hauteur.get())
-    largeur = int(largeur.get())
     # Charge l'image ouverte par la fonction ouvrir_image
     image = Image.open(f"temporaire\image_temporaire_{d.indice_temp - 1}.png").convert("RGBA")
     image2 = Image.open(d.choix).convert("RGBA")
-    image2 = image2.resize((hauteur,largeur), Image.Resampling.LANCZOS)
+    image2 = image2.resize((largeur,hauteur), Image.Resampling.LANCZOS)
 
     # Crée des tableaux numpy avec l'image et le tampon
     image_np = np.asarray(image)
@@ -97,8 +97,8 @@ def tampons(canvas, d, hauteur, largeur):
     image2_np = np.copy(tampon)
 
     # Calcul les coordonnées où commence et fini le tampon
-    debut_x = d.x1-hauteur//2
-    debut_y = d.y1-largeur//2
+    debut_x = d.x1-largeur//2
+    debut_y = d.y1-hauteur//2
     fin_x = debut_x + largeur
     fin_y = debut_y + hauteur
 
@@ -213,7 +213,7 @@ def fond(canvas, d):
     # Charge l'image ouverte par la fonction ouvrir_image
     image = Image.open(f"temporaire\image_temporaire_{d.indice_temp - 1}.png").convert("RGBA")
     image2 = Image.open(d.choix).convert("RGBA")
-    image2 = image2.resize((image.height, image.width), Image.Resampling.LANCZOS)
+    image2 = image2.resize((image.width, image.height), Image.Resampling.LANCZOS)
 
     # Crée des tableaux numpy avec l'image et le fond
     image_np = np.asarray(image)
