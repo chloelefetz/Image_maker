@@ -35,6 +35,19 @@ def boite_transparence(canvas, d):
     slider.bind("<ButtonRelease-1>", lambda event: on_slider_change(event, chiffre_entry)) # <ButtonRelease-1> = l'utilisateur relache le bouton 1
     chiffre_entry.bind("<Return>", lambda event: on_entry_change(event, slider)) # <Return> = L'utilisateur appuie sur entrer
 
+    # Création d'une frame pour mettre une image et du texte côte à côte
+    frame1 = tk.Frame(fenetre_transparence)
+    frame1.pack(padx=10, pady=10)
+    img1 = Image.open("image_logiciel\clic_gauche.png").convert("RGBA")
+    img_exemple1 = ImageTk.PhotoImage(img1)
+    # Créer un label pour afficher l'image du clic gauche
+    image_label1 = tk.Label(frame1, image=img_exemple1)
+    image_label1.pack(side=tk.LEFT, padx=10, pady=10)
+    # Créer la zone de texte
+    texte1 = "Choisissez la couleur à supprimer par un click gauche"
+    texte_label1 = tk.Label(frame1, text=texte1)
+    texte_label1.pack(side=tk.LEFT, padx=10, pady=10)
+
     # Charger une image d'exemple
     img = Image.open("image_logiciel\sportif_transparence.png").convert("RGBA")
     img_exemple = ImageTk.PhotoImage(img)
