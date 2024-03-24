@@ -44,7 +44,7 @@ def boite_transparence(canvas, d):
     image_label1 = tk.Label(frame1, image=img_exemple1)
     image_label1.pack(side=tk.LEFT, padx=10, pady=10)
     # Créer la zone de texte
-    texte1 = "Choisissez la couleur à supprimer par un click gauche"
+    texte1 = "Choisissez la couleur à supprimer par un clic gauche"
     texte_label1 = tk.Label(frame1, text=texte1)
     texte_label1.pack(side=tk.LEFT, padx=10, pady=10)
 
